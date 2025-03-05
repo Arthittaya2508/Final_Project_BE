@@ -1,5 +1,5 @@
 import express from "express";
-import db from "../../lib/db.js";
+import db from "../../lib/db.js"; // เพิ่ม `.js` ที่ท้ายไฟล์
 
 const router = express.Router();
 
@@ -17,16 +17,22 @@ router.get("/", async (req, res) => {
 // Add a new brand
 router.post("/", async (req, res) => {
   try {
-    const { brand_name } = req.body;
+    const { brand_name } = req.body; // รับข้อมูล brand_name จาก request body
 
+    if (!brand_name) {
+      return res.status(400).json({ error: "Color name is required" });
+    }
+
+    // Insert the new brand into the brands table
     const [result] = await db.query(
-      `INSERT INTO brands (brand_name) VALUES (?)`,
+      "INSERT INTO brands (brand_name) VALUES (?)",
       [brand_name]
     );
 
-    res.json({ success: true, result });
+    // Respond with the newly added brand's id and name
+    res.status(201).json({ brand_id: result.insertId, brand_name });
   } catch (error) {
-    console.error("Error inserting brand:", error);
+    console.error("Error adding brand:", error);
     res.status(500).json({ error: "Failed to add brand" });
   }
 });

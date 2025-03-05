@@ -1,5 +1,5 @@
-import express from "express";  // ใช้ import แทน require
-import db from "../../lib/db.js"; // ใช้ import แทน require
+import express from "express";
+import db from "../../lib/db.js"; // เพิ่ม `.js` ที่ท้ายไฟล์
 
 const router = express.Router();
 
@@ -17,17 +17,22 @@ router.get("/", async (req, res) => {
 // Add a new size
 router.post("/", async (req, res) => {
   try {
-    const data = req.body;
-    const { size_name } = data;
+    const { size_name } = req.body; // รับข้อมูล size_name จาก request body
 
+    if (!size_name) {
+      return res.status(400).json({ error: "size name is required" });
+    }
+
+    // Insert the new size into the sizes table
     const [result] = await db.query(
-      `INSERT INTO sizes (size_name) VALUES (?)`,
+      "INSERT INTO sizes (size_name) VALUES (?)",
       [size_name]
     );
 
-    res.json({ success: true, result });
+    // Respond with the newly added size's id and name
+    res.status(201).json({ size_id: result.insertId, size_name });
   } catch (error) {
-    console.error("Error inserting size:", error);
+    console.error("Error adding size:", error);
     res.status(500).json({ error: "Failed to add size" });
   }
 });
@@ -35,8 +40,7 @@ router.post("/", async (req, res) => {
 // Update an existing size
 router.put("/", async (req, res) => {
   try {
-    const data = req.body;
-    const { size_id, size_name } = data;
+    const { size_id, size_name } = req.body;
 
     const [result] = await db.query(
       `UPDATE sizes SET size_name = ? WHERE size_id = ?`,
@@ -53,8 +57,7 @@ router.put("/", async (req, res) => {
 // Delete an existing size
 router.delete("/", async (req, res) => {
   try {
-    const data = req.body;
-    const { size_id } = data;
+    const { size_id } = req.body;
 
     const [result] = await db.query(`DELETE FROM sizes WHERE size_id = ?`, [
       size_id,

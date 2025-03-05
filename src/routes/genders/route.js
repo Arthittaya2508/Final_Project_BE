@@ -1,5 +1,5 @@
 import express from "express";
-import db from "../../lib/db.js"; // เพิ่ม .js เพื่อรองรับ ES Module
+import db from "../../lib/db.js"; // เพิ่ม `.js` ที่ท้ายไฟล์
 
 const router = express.Router();
 
@@ -17,16 +17,22 @@ router.get("/", async (req, res) => {
 // Add a new gender
 router.post("/", async (req, res) => {
   try {
-    const { gender_name } = req.body;
+    const { gender_name } = req.body; // รับข้อมูล gender_name จาก request body
 
+    if (!gender_name) {
+      return res.status(400).json({ error: "gender name is required" });
+    }
+
+    // Insert the new gender into the genders table
     const [result] = await db.query(
-      `INSERT INTO genders (gender_name) VALUES (?)`,
+      "INSERT INTO genders (gender_name) VALUES (?)",
       [gender_name]
     );
 
-    res.json({ success: true, result });
+    // Respond with the newly added gender's id and name
+    res.status(201).json({ gender_id: result.insertId, gender_name });
   } catch (error) {
-    console.error("Error inserting gender:", error);
+    console.error("Error adding gender:", error);
     res.status(500).json({ error: "Failed to add gender" });
   }
 });

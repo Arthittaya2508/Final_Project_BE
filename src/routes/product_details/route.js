@@ -1,15 +1,28 @@
-import express from "express";  // ใช้ import แทน require
+import express from "express";
 import db from "../../lib/db.js";
+
 const router = express.Router();
 
-// Fetch all products
+// Fetch product details with filtering by pro_id
 router.get("/", async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT * FROM product_details");
-    res.json(rows);
+    const { pro_id } = req.query;
+
+    if (!pro_id) {
+      return res.status(400).json({ error: "pro_id is required" });
+    }
+
+    const query = "SELECT * FROM product_details WHERE pro_id = ?";
+    const [rows] = await db.query(query, [pro_id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "No product details found" });
+    }
+
+    res.json(rows); // ส่งคืนข้อมูลทั้งหมดที่มี pro_id ตรงกัน
   } catch (error) {
-    console.error("Error fetching products:", error);
-    res.status(500).json({ error: "Failed to fetch products" });
+    console.error("Error fetching product details:", error);
+    res.status(500).json({ error: "Failed to fetch product details" });
   }
 });
 
@@ -22,14 +35,14 @@ router.post("/", async (req, res) => {
       size_id,
       gender_id,
       stock_quantity,
-      sku,
+
       pro_image,
       sale_price,
       cost_price,
     } = req.body;
 
     const [result] = await db.query(
-      `INSERT INTO product_details (pro_id, color_id, size_id, gender_id, stock_quantity, sku, pro_image, sale_price, cost_price)
+      `INSERT INTO product_details (pro_id, color_id, size_id, gender_id, stock_quantity,  pro_image, sale_price, cost_price)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         pro_id,
@@ -37,7 +50,6 @@ router.post("/", async (req, res) => {
         size_id,
         gender_id,
         stock_quantity,
-        sku,
         pro_image,
         sale_price,
         cost_price,
@@ -60,7 +72,6 @@ router.put("/", async (req, res) => {
       size_id,
       gender_id,
       stock_quantity,
-      sku,
       pro_image,
       sale_price,
       cost_price,
@@ -68,14 +79,13 @@ router.put("/", async (req, res) => {
 
     const [result] = await db.query(
       `UPDATE product_details 
-      SET color_id = ?, size_id = ?, gender_id = ?, stock_quantity = ?, sku = ?, pro_image = ?, sale_price = ?, cost_price = ? 
+      SET color_id = ?, size_id = ?, gender_id = ?, stock_quantity = ?,  pro_image = ?, sale_price = ?, cost_price = ? 
       WHERE pro_id = ?`,
       [
         color_id,
         size_id,
         gender_id,
         stock_quantity,
-        sku,
         pro_image,
         sale_price,
         cost_price,

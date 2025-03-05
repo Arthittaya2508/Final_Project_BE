@@ -1,8 +1,7 @@
-import express from "express";  // ใช้ import แทน require
+import express from "express"; // ใช้ import แทน require
 import db from "../../lib/db.js";
 
 const router = express.Router();
-
 
 // Fetch all users
 router.get("/", async (req, res) => {
@@ -21,7 +20,8 @@ router.post("/", async (req, res) => {
 
   try {
     const data = req.body; // Access the request body
-    const { name, lastname, telephone, email, username, password, image } = data;
+    const { name, lastname, telephone, email, username, password, image } =
+      data;
 
     await connection.beginTransaction(); // Start transaction
 
@@ -52,7 +52,16 @@ router.put("/", async (req, res) => {
 
   try {
     const data = req.body;
-    const { user_id, name, lastname, telephone, email, username, password, image } = data;
+    const {
+      user_id,
+      name,
+      lastname,
+      telephone,
+      email,
+      username,
+      password,
+      image,
+    } = data;
 
     await connection.beginTransaction(); // Start transaction
 

@@ -1,4 +1,4 @@
-import express from "express";  // ใช้ import แทน require
+import express from "express"; // ใช้ import แทน require
 import db from "../../lib/db.js";
 
 const router = express.Router();
@@ -9,20 +9,26 @@ router.get("/", async (req, res) => {
     const [rows] = await db.query("SELECT * FROM products");
     res.json(rows);
   } catch (error) {
-    console.error("Error fetching products:", error);  
+    console.error("Error fetching products:", error);
     res.status(500).json({ error: "Failed to fetch products" });
   }
 });
 
 // Add a new product
+// Add a new product
 router.post("/", async (req, res) => {
   try {
-    const { pro_name, pro_des, type_id, band_id } = req.body;
+    const { sku, pro_name, pro_des, category_id, brand_id } = req.body;
+
+    // ตรวจสอบว่าทุกฟิลด์ที่ต้องการมีค่า
+    if (!sku || !pro_name || !pro_des || !category_id || !brand_id) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
 
     const [result] = await db.query(
-      `INSERT INTO products (pro_name, pro_des, type_id, band_id)
-      VALUES (?, ?, ?, ?)`,
-      [pro_name, pro_des, type_id, band_id]
+      `INSERT INTO products ( sku ,pro_name, pro_des, category_id, brand_id)
+      VALUES (?, ?, ?, ? , ?, )`,
+      [sku, pro_name, pro_des, category_id, brand_id]
     );
 
     res.json({ success: true, result });
@@ -35,11 +41,12 @@ router.post("/", async (req, res) => {
 // Update an existing product
 router.put("/", async (req, res) => {
   try {
-    const { pro_id, pro_name, pro_des, type_id, band_id } = req.body;
+    const { sku, pro_id, pro_name, pro_des, category_id, brand_id } = req.body;
 
     const [result] = await db.query(
-      `UPDATE products SET pro_name = ?, pro_des = ?, type_id = ?, band_id = ? WHERE pro_id = ?`,
-      [pro_name, pro_des, type_id, band_id, pro_id]
+      `UPDATE products SET sku = ? pro_name = ?, pro_des = ?, category_id = ?, brand_id = ? WHERE pro_id = ?`[
+        (sku, pro_name, pro_des, category_id, brand_id, pro_id)
+      ]
     );
 
     res.json({ success: true, result });

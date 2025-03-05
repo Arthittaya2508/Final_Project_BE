@@ -1,5 +1,5 @@
 import express from "express";
-import db from "../../lib/db.js"; // ปรับเส้นทางให้ตรงกับตำแหน่งของไฟล์ db.js ที่ใช้งาน
+import db from "../../lib/db.js"; // เพิ่ม `.js` ที่ท้ายไฟล์
 
 const router = express.Router();
 
@@ -17,16 +17,22 @@ router.get("/", async (req, res) => {
 // Add a new category
 router.post("/", async (req, res) => {
   try {
-    const { category_name } = req.body;
+    const { category_name } = req.body; // รับข้อมูล category_name จาก request body
 
+    if (!category_name) {
+      return res.status(400).json({ error: "category name is required" });
+    }
+
+    // Insert the new category into the categories table
     const [result] = await db.query(
-      `INSERT INTO categories (category_name) VALUES (?)`,
+      "INSERT INTO categories (category_name) VALUES (?)",
       [category_name]
     );
 
-    res.json({ success: true, result });
+    // Respond with the newly added category's id and name
+    res.status(201).json({ category_id: result.insertId, category_name });
   } catch (error) {
-    console.error("Error inserting category:", error);
+    console.error("Error adding category:", error);
     res.status(500).json({ error: "Failed to add category" });
   }
 });
@@ -35,13 +41,11 @@ router.post("/", async (req, res) => {
 router.put("/", async (req, res) => {
   try {
     const { category_id, category_name } = req.body;
-    console.log({ category_id, category_name }); // ตรวจสอบข้อมูลที่ได้รับ
 
     const [result] = await db.query(
       `UPDATE categories SET category_name = ? WHERE category_id = ?`,
       [category_name, category_id]
     );
-    console.log(result); // ตรวจสอบผลลัพธ์
 
     res.json({ success: true, result });
   } catch (error) {
@@ -54,13 +58,11 @@ router.put("/", async (req, res) => {
 router.delete("/", async (req, res) => {
   try {
     const { category_id } = req.body;
-    console.log({ category_id }); // ตรวจสอบข้อมูลที่ได้รับ
 
     const [result] = await db.query(
       `DELETE FROM categories WHERE category_id = ?`,
       [category_id]
     );
-    console.log(result); // ตรวจสอบผลลัพธ์
 
     res.json({ success: true, result });
   } catch (error) {

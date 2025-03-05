@@ -17,16 +17,22 @@ router.get("/", async (req, res) => {
 // Add a new color
 router.post("/", async (req, res) => {
   try {
-    const { color_name } = req.body;
+    const { color_name } = req.body; // รับข้อมูล color_name จาก request body
 
+    if (!color_name) {
+      return res.status(400).json({ error: "Color name is required" });
+    }
+
+    // Insert the new color into the colors table
     const [result] = await db.query(
-      `INSERT INTO colors (color_name) VALUES (?)`,
+      "INSERT INTO colors (color_name) VALUES (?)",
       [color_name]
     );
 
-    res.json({ success: true, result });
+    // Respond with the newly added color's id and name
+    res.status(201).json({ color_id: result.insertId, color_name });
   } catch (error) {
-    console.error("Error inserting color:", error);
+    console.error("Error adding color:", error);
     res.status(500).json({ error: "Failed to add color" });
   }
 });
