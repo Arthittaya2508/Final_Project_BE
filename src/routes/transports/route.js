@@ -1,5 +1,5 @@
-import express from "express";  // ใช้ import แทน require
-import db from "../../lib/db.js";  // ใช้ import แทน require
+import express from "express"; // ใช้ import แทน require
+import db from "../../lib/db.js"; // ใช้ import แทน require
 
 const router = express.Router();
 
@@ -18,11 +18,11 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const data = req.body; // Use req.body to access the parsed JSON data
-    const { tran_name, shipping_cost } = data; // Get shipping cost from request
+    const { transport_name, transport_cost } = data; // Get shipping cost from request
 
     const [result] = await db.query(
-      `INSERT INTO transports (tran_name, shipping_cost) VALUES (?, ?)`,
-      [tran_name, shipping_cost] // Insert shipping cost
+      `INSERT INTO transports (transport_name, transport_cost) VALUES (?, ?)`,
+      [transport_name, transport_cost] // Insert shipping cost
     );
 
     res.json({ success: true, result });
@@ -36,11 +36,11 @@ router.post("/", async (req, res) => {
 router.put("/", async (req, res) => {
   try {
     const data = req.body; // Use req.body to access the parsed JSON data
-    const { tran_id, tran_name, shipping_cost } = data; // Get shipping cost from request
+    const { transport_id, transport_name, transport_cost } = data; // Get shipping cost from request
 
     const [result] = await db.query(
-      `UPDATE transports SET tran_name = ?, shipping_cost = ? WHERE tran_id = ?`,
-      [tran_name, shipping_cost, tran_id] // Update shipping cost
+      `UPDATE transports SET transport_name = ?, transport_cost = ? WHERE transport_id = ?`,
+      [transport_name, transport_cost, transport_id] // Update shipping cost
     );
 
     res.json({ success: true, result });
@@ -54,11 +54,11 @@ router.put("/", async (req, res) => {
 router.delete("/", async (req, res) => {
   try {
     const data = req.body; // Use req.body to access the parsed JSON data
-    const { tran_id } = data;
+    const { transport_id } = data;
 
     const [result] = await db.query(
-      `DELETE FROM transports WHERE tran_id = ?`,
-      [tran_id]
+      `DELETE FROM transports WHERE transport_id = ?`,
+      [transport_id]
     );
 
     res.json({ success: true, result });

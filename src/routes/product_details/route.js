@@ -29,36 +29,51 @@ router.get("/", async (req, res) => {
 // Add a new product
 router.post("/", async (req, res) => {
   try {
+    console.log("📥 ข้อมูลที่ได้รับจาก Frontend:", req.body);
+
     const {
       pro_id,
       color_id,
       size_id,
       gender_id,
       stock_quantity,
-
-      pro_image,
       sale_price,
       cost_price,
+      pro_image,
     } = req.body;
 
+    // ตรวจสอบว่าไม่มีค่าเป็น undefined หรือ null
+    if (
+      pro_id === undefined ||
+      color_id === undefined ||
+      size_id === undefined ||
+      gender_id === undefined ||
+      stock_quantity === undefined ||
+      sale_price === undefined ||
+      cost_price === undefined ||
+      pro_image === undefined
+    ) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
     const [result] = await db.query(
-      `INSERT INTO product_details (pro_id, color_id, size_id, gender_id, stock_quantity,  pro_image, sale_price, cost_price)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO product_details (pro_id, color_id, size_id, gender_id, stock_quantity, sale_price, cost_price, pro_image)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         pro_id,
         color_id,
         size_id,
         gender_id,
         stock_quantity,
-        pro_image,
         sale_price,
         cost_price,
+        pro_image,
       ]
     );
 
     res.json({ success: true, result });
   } catch (error) {
-    console.error("Error inserting product:", error);
+    console.error("❌ Error inserting product:", error);
     res.status(500).json({ error: "Failed to add product" });
   }
 });
@@ -72,23 +87,23 @@ router.put("/", async (req, res) => {
       size_id,
       gender_id,
       stock_quantity,
-      pro_image,
       sale_price,
       cost_price,
+      pro_image,
     } = req.body;
 
     const [result] = await db.query(
       `UPDATE product_details 
-      SET color_id = ?, size_id = ?, gender_id = ?, stock_quantity = ?,  pro_image = ?, sale_price = ?, cost_price = ? 
+      SET color_id = ?, size_id = ?, gender_id = ?, stock_quantity = ?, sale_price = ?, cost_price = ? ,pro_image = ?,
       WHERE pro_id = ?`,
       [
         color_id,
         size_id,
         gender_id,
         stock_quantity,
-        pro_image,
         sale_price,
         cost_price,
+        pro_image,
         pro_id,
       ]
     );

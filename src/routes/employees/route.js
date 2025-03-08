@@ -22,7 +22,8 @@ router.post("/", async (req, res) => {
     const {
       name,
       lastname,
-      phoneNumber,
+      emp_code,
+      telephone,
       email,
       username,
       password,
@@ -34,9 +35,19 @@ router.post("/", async (req, res) => {
 
     // Insert employee data
     const [employeeResult] = await connection.query(
-      `INSERT INTO employees (name, lastname, phoneNumber, email, username, password, image, position)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [name, lastname, phoneNumber, email, username, password, image, position]
+      `INSERT INTO employees (name, lastname,emp_code, telephone, email, username, password, image, position)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?,? )`,
+      [
+        name,
+        lastname,
+        emp_code,
+        telephone,
+        email,
+        username,
+        password,
+        image,
+        position,
+      ]
     );
 
     const emp_id = employeeResult.insertId; // Get insertId
@@ -62,7 +73,8 @@ router.put("/", async (req, res) => {
       emp_id,
       name,
       lastname,
-      phoneNumber,
+      emp_code,
+      telephone,
       email,
       username,
       password,
@@ -74,12 +86,13 @@ router.put("/", async (req, res) => {
 
     // Update employee data
     await connection.query(
-      `UPDATE employees SET name = ?, lastname = ?, phoneNumber = ?, email = ?, username = ?, password = ?, image = ?, position = ?
+      `UPDATE employees SET name = ?, lastname = ?, emp_code = ?, telephone = ?, email = ?, username = ?, password = ?, image = ?, position = ?
        WHERE id = ?`,
       [
         name,
         lastname,
-        phoneNumber,
+        emp_code,
+        telephone,
         email,
         username,
         password,

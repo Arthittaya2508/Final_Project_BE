@@ -23,7 +23,7 @@ router.post("/", async (req, res) => {
 
       // Insert the address data into the database
       await db.query(
-        "INSERT INTO addresses (address_name, customer_id, district, amphoe, province, zipcode) VALUES (?, ?, ?, ?, ?, ?)",
+        "INSERT INTO address (address_name, user_id, district, amphoe, province, zipcode) VALUES (?, ?, ?, ?, ?, ?)",
         [address_name, user_id, district, amphoe, province, zipcode]
       );
     }
@@ -35,14 +35,34 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Retrieve addresses from the database
+// Retrieve addresses for a specific user
 router.get("/", async (req, res) => {
   try {
+    // Check if user_id is provided as query parameter
+    const { user_id } = req.query;
+
+    // Check if user_id exists and is a valid number
+    if (!user_id || isNaN(user_id)) {
+      return res
+        .status(400)
+        .json({ message: "Invalid or missing user_id parameter." });
+    }
+
+    // Query the database for addresses for the specific user_id
+    const query = "SELECT * FROM address WHERE user_id = ?";
+    const queryParams = [user_id];
+
     // Retrieve addresses from the database
-    const [rows] = await db.query("SELECT * FROM addresses");
+    const [rows] = await db.query(query, queryParams);
 
     // Log the retrieved rows for debugging
     console.log("Retrieved addresses:", rows);
+
+    if (rows.length === 0) {
+      return res
+        .status(404)
+        .json({ message: `No addresses found for user_id: ${user_id}` });
+    }
 
     res.status(200).json(rows);
   } catch (error) {

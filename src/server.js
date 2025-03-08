@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import categoriesRouter from "./routes/categories/route.js";
 import sizesRouter from "./routes/sizes/route.js";
 import transportsRouter from "./routes/transports/route.js";
-import addressesRouter from "./routes/addresses/route.js";
+import addressRouter from "./routes/address/route.js";
 import brandsRouter from "./routes/brands/route.js";
 import gendersRouter from "./routes/genders/route.js";
 import colorsRouter from "./routes/colors/route.js";
@@ -38,7 +38,7 @@ app.use("/api/categories", categoriesRouter);
 app.use("/api/orders", ordersRouter);
 app.use("/api/sizes", sizesRouter);
 app.use("/api/transports", transportsRouter);
-app.use("/api/addresses", addressesRouter);
+app.use("/api/address", addressRouter);
 app.use("/api/brands", brandsRouter);
 app.use("/api/genders", gendersRouter);
 app.use("/api/colors", colorsRouter);
@@ -50,7 +50,8 @@ app.use("/api/users", usersRouter);
 app.use("/api/order_details", orderDetailsRouter);
 
 // Start Server
-app.listen(PORT, "0.0.0.0", () => {  // ต้องฟังที่ 0.0.0.0 เพื่อให้สามารถรับคำขอจากภายนอกได้
+app.listen(PORT, "0.0.0.0", () => {
+  // ต้องฟังที่ 0.0.0.0 เพื่อให้สามารถรับคำขอจากภายนอกได้
   console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
 
