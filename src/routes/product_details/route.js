@@ -31,44 +31,21 @@ router.post("/", async (req, res) => {
   try {
     console.log("📥 ข้อมูลที่ได้รับจาก Frontend:", req.body);
 
-    const {
-      pro_id,
-      color_id,
-      size_id,
-      gender_id,
-      stock_quantity,
-      sale_price,
-      cost_price,
-      pro_image,
-    } = req.body;
+    const { pro_id, gender_id, pro_image } = req.body;
 
     // ตรวจสอบว่าไม่มีค่าเป็น undefined หรือ null
     if (
       pro_id === undefined ||
-      color_id === undefined ||
-      size_id === undefined ||
       gender_id === undefined ||
-      stock_quantity === undefined ||
-      sale_price === undefined ||
-      cost_price === undefined ||
       pro_image === undefined
     ) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
     const [result] = await db.query(
-      `INSERT INTO product_details (pro_id, color_id, size_id, gender_id, stock_quantity, sale_price, cost_price, pro_image)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        pro_id,
-        color_id,
-        size_id,
-        gender_id,
-        stock_quantity,
-        sale_price,
-        cost_price,
-        pro_image,
-      ]
+      `INSERT INTO product_details (pro_id, gender_id, pro_image)
+      VALUES (?, ?, ?)`,
+      [pro_id, gender_id, pro_image]
     );
 
     res.json({ success: true, result });
@@ -81,31 +58,13 @@ router.post("/", async (req, res) => {
 // Update an existing product
 router.put("/", async (req, res) => {
   try {
-    const {
-      pro_id,
-      color_id,
-      size_id,
-      gender_id,
-      stock_quantity,
-      sale_price,
-      cost_price,
-      pro_image,
-    } = req.body;
+    const { pro_id, gender_id, pro_image } = req.body;
 
     const [result] = await db.query(
       `UPDATE product_details 
-      SET color_id = ?, size_id = ?, gender_id = ?, stock_quantity = ?, sale_price = ?, cost_price = ? ,pro_image = ?,
+      SET  gender_id = ?, pro_image = ?,
       WHERE pro_id = ?`,
-      [
-        color_id,
-        size_id,
-        gender_id,
-        stock_quantity,
-        sale_price,
-        cost_price,
-        pro_image,
-        pro_id,
-      ]
+      [gender_id, pro_image, pro_id]
     );
 
     res.json({ success: true, result });

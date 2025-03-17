@@ -16,6 +16,8 @@ import employeesRouter from "./routes/employees/route.js";
 import ordersRouter from "./routes/orders/route.js";
 import usersRouter from "./routes/users/route.js";
 import orderDetailsRouter from "./routes/order_details/route.js";
+import companyRouter from "./routes/company/route.js";
+import productDetailItemRouter from "./routes/product_detail_items/route.js";
 
 // โหลดค่า .env
 dotenv.config();
@@ -26,7 +28,7 @@ const PORT = process.env.PORT || 5000; // กำหนดให้ใช้พ�
 // ตั้งค่า CORS ให้รองรับ Production และ Development
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: process.env.CLIENT_URL || "http://localhost:3001",
   })
 );
 
@@ -48,8 +50,10 @@ app.use("/api/registers", registersRouter);
 app.use("/api/employees", employeesRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/order_details", orderDetailsRouter);
+app.use("/api/company", companyRouter);
+app.use("/api/product_detail_items", productDetailItemRouter);
 
-// Start Server
+// // Start Server
 app.listen(PORT, "0.0.0.0", () => {
   // ต้องฟังที่ 0.0.0.0 เพื่อให้สามารถรับคำขอจากภายนอกได้
   console.log(`✅ Server is running on http://localhost:${PORT}`);

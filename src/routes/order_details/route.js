@@ -1,4 +1,4 @@
-import express from "express";  // ใช้ import แทน require
+import express from "express"; // ใช้ import แทน require
 import db from "../../lib/db.js";
 
 const router = express.Router();
@@ -18,13 +18,33 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const data = req.body;
-    const { order_detail_id, order_id, product_id, quantity, selling_price, total_price, total_quantity, transport_id } = data;
+    const {
+      order_detail_id,
+      order_id,
+      pro_id,
+      pro_detail_id,
+      quantity,
+      selling_price,
+      total_price,
+      total_quantity,
+      transport_id,
+    } = data;
 
     const [result] = await db.query(
-      `INSERT INTO order_details (order_detail_id, order_id, product_id, quantity, selling_price, total_price, total_quantity, transport_id) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO order_details (order_detail_id, order_id, pro_id, pro_detail_id, quantity, selling_price, total_price, total_quantity, transport_id) 
+       VALUES (?, ?, ?, ?,?, ?, ?, ?, ?)`,
 
-      [order_detail_id, order_id, product_id, quantity, selling_price, total_price, total_quantity, transport_id]
+      [
+        order_detail_id,
+        order_id,
+        pro_id,
+        pro_detail_id,
+        quantity,
+        selling_price,
+        total_price,
+        total_quantity,
+        transport_id,
+      ]
     );
 
     res.json({ success: true, result });
@@ -38,14 +58,34 @@ router.post("/", async (req, res) => {
 router.put("/", async (req, res) => {
   try {
     const data = req.body;
-    const { order_detail_id, order_id, product_id, quantity, selling_price, total_price, total_quantity, transport_id } = data;
+    const {
+      order_detail_id,
+      order_id,
+      pro_id,
+      pro_detail_id,
+      quantity,
+      selling_price,
+      total_price,
+      total_quantity,
+      transport_id,
+    } = data;
 
     const [result] = await db.query(
       `UPDATE order_details 
-       SET order_detail_id = ?, order_id = ?, product_id = ?, quantity = ?, selling_price = ?, total_price = ?, total_quantity = ?, transport_id = ? 
+       SET order_detail_id = ?, order_id = ?, pro_id = ?,  pro_detail_id = ?, quantity = ?, selling_price = ?, total_price = ?, total_quantity = ?, transport_id = ? 
        WHERE order_detail_id = ?`,
 
-      [order_detail_id, order_id, product_id, quantity, selling_price, total_price, total_quantity, transport_id, order_detail_id]
+      [
+        order_id,
+        pro_id,
+        pro_detail_id,
+        quantity,
+        selling_price,
+        total_price,
+        total_quantity,
+        transport_id,
+        order_detail_id,
+      ]
     );
 
     res.json({ success: true, result });
