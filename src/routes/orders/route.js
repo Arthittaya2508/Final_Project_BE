@@ -1,5 +1,5 @@
-import express from "express";  // ใช้ import แทน require
-import db from "../../lib/db.js";  // ใช้ import แทน require
+import express from "express"; // ใช้ import แทน require
+import db from "../../lib/db.js"; // ใช้ import แทน require
 
 const router = express.Router();
 
@@ -18,11 +18,12 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const data = req.body;
-    const { user_id, order_date, total_amount, shipping_date, order_status } = data;
+    const { user_id, order_date, total_amount, shipping_date, status_id } =
+      data;
 
     const [result] = await db.query(
-      `INSERT INTO orders (user_id, order_date, total_amount, shipping_date, order_status) VALUES (?, ?, ?, ?, ?)`,
-      [user_id, order_date, total_amount, shipping_date, order_status]
+      `INSERT INTO orders (user_id, order_date, total_amount, shipping_date, status_id) VALUES (?, ?, ?, ?, ?)`,
+      [user_id, order_date, total_amount, shipping_date, status_id]
     );
 
     res.json({ success: true, result });
@@ -36,11 +37,18 @@ router.post("/", async (req, res) => {
 router.put("/", async (req, res) => {
   try {
     const data = req.body;
-    const { order_id, user_id, order_date, total_amount, shipping_date, order_status } = data;
+    const {
+      order_id,
+      user_id,
+      order_date,
+      total_amount,
+      shipping_date,
+      status_id,
+    } = data;
 
     const [result] = await db.query(
-      `UPDATE orders SET user_id = ?, order_date = ?, total_amount = ?, shipping_date = ?, order_status = ? WHERE order_id = ?`,
-      [user_id, order_date, total_amount, shipping_date, order_status, order_id]
+      `UPDATE orders SET user_id = ?, order_date = ?, total_amount = ?, shipping_date = ?, status_id = ? WHERE order_id = ?`,
+      [user_id, order_date, total_amount, shipping_date, status_id, order_id]
     );
 
     res.json({ success: true, result });

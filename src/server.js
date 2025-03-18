@@ -18,24 +18,26 @@ import usersRouter from "./routes/users/route.js";
 import orderDetailsRouter from "./routes/order_details/route.js";
 import companyRouter from "./routes/company/route.js";
 import productDetailItemRouter from "./routes/product_detail_items/route.js";
+import statusOrdersRouter from "./routes/status_orders/route.js";
 
 // โหลดค่า .env
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000; // กำหนดให้ใช้พอร์ตจาก Render หรือพอร์ต 10000 เป็นค่าตั้งต้น
+const PORT = process.env.PORT || 5000; // ใช้พอร์ตจาก .env หรือค่าเริ่มต้น
 
-// ตั้งค่า CORS ให้รองรับ Production และ Development
+// ตั้งค่า CORS
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:3000",
   })
 );
 
-// ให้สามารถใช้ JSON จาก body ของ request
-app.use(express.json());
+// ✅ เพิ่มการตั้งค่าขนาด request body
+app.use(express.json({ limit: "50mb" })); // ปรับ limit เป็น 50MB
+app.use(express.urlencoded({ limit: "50mb", extended: true })); // รองรับ URL-encoded data ที่มีขนาดใหญ่
 
-// ตั้งค่ารูทต่างๆ
+// ตั้งค่ารูท API
 app.use("/api/categories", categoriesRouter);
 app.use("/api/orders", ordersRouter);
 app.use("/api/sizes", sizesRouter);
@@ -52,10 +54,10 @@ app.use("/api/users", usersRouter);
 app.use("/api/order_details", orderDetailsRouter);
 app.use("/api/company", companyRouter);
 app.use("/api/product_detail_items", productDetailItemRouter);
+app.use("/api/status_orders", statusOrdersRouter);
 
-// // Start Server
+// Start Server
 app.listen(PORT, "0.0.0.0", () => {
-  // ต้องฟังที่ 0.0.0.0 เพื่อให้สามารถรับคำขอจากภายนอกได้
   console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
 

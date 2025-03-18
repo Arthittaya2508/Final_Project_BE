@@ -16,7 +16,8 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const { sku, pro_name, pro_des, category_id, brand_id } = req.body;
+    const { sku, pro_name, pro_des, category_id, brand_id, gender_id } =
+      req.body;
 
     // ตรวจสอบว่าทุกฟิลด์ที่ต้องการมีค่า
     if (!sku || !pro_name || !pro_des || !category_id || !brand_id) {
@@ -24,9 +25,9 @@ router.post("/", async (req, res) => {
     }
 
     const [result] = await db.query(
-      `INSERT INTO products (sku, pro_name, pro_des, category_id, brand_id)
-      VALUES (?, ?, ?, ?, ?)`,
-      [sku, pro_name, pro_des, category_id, brand_id]
+      `INSERT INTO products (sku, pro_name, pro_des, category_id, brand_id,gender_id)
+      VALUES (?, ?, ?, ?, ?,?)`,
+      [sku, pro_name, pro_des, category_id, brand_id, gender_id]
     );
 
     res.json({ success: true, result });
@@ -39,16 +40,25 @@ router.post("/", async (req, res) => {
 // Update an existing product
 router.put("/", async (req, res) => {
   try {
-    const { sku, pro_id, pro_name, pro_des, category_id, brand_id } = req.body;
+    const { sku, pro_id, pro_name, pro_des, category_id, brand_id, gender_id } =
+      req.body;
 
     // ตรวจสอบว่าทุกฟิลด์ที่ต้องการมีค่า
-    if (!sku || !pro_id || !pro_name || !pro_des || !category_id || !brand_id) {
+    if (
+      !sku ||
+      !pro_id ||
+      !pro_name ||
+      !pro_des ||
+      !category_id ||
+      !brand_id ||
+      !gender_id
+    ) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
     const [result] = await db.query(
-      `UPDATE products SET sku = ?, pro_name = ?, pro_des = ?, category_id = ?, brand_id = ? WHERE pro_id = ?`,
-      [sku, pro_name, pro_des, category_id, brand_id, pro_id]
+      `UPDATE products SET sku = ?, pro_name = ?, pro_des = ?, category_id = ?, brand_id = ? ,gender_id= ? WHERE pro_id = ?`,
+      [sku, pro_name, pro_des, category_id, brand_id, gender_id, pro_id]
     );
 
     res.json({ success: true, result });
