@@ -3,6 +3,9 @@ import db from "../../lib/db.js";
 
 const router = express.Router();
 
+// กำหนดให้ Express ใช้ express.json() เพื่อแปลงข้อมูล JSON ใน body
+router.use(express.json()); // เพิ่มบรรทัดนี้
+
 // Fetch product details with filtering by pro_id
 router.get("/", async (req, res) => {
   try {
@@ -62,7 +65,7 @@ router.put("/", async (req, res) => {
 
     const [result] = await db.query(
       `UPDATE product_details 
-      SET  gender_id = ?, pro_image = ?,
+      SET gender_id = ?, pro_image = ?
       WHERE pro_id = ?`,
       [gender_id, pro_image, pro_id]
     );

@@ -24,9 +24,9 @@ router.post("/", async (req, res) => {
     }
 
     const [result] = await db.query(
-      `INSERT INTO company ( company_name, address, phone)
+      `INSERT INTO company ( company_name, address, phone ,brand_id )
       VALUES (?, ?, ?)`,
-      [company_name, address, phone]
+      [company_name, address, phone, brand_id]
     );
 
     res.json({ success: true, result });
@@ -39,11 +39,11 @@ router.post("/", async (req, res) => {
 // Update an existing company
 router.put("/", async (req, res) => {
   try {
-    const { company_name, address, phone } = req.body;
+    const { company_name, address, phone, brand_id } = req.body;
 
     const [result] = await db.query(
-      `UPDATE company SET comcompany_name = ? address = ?, phone = ? WHERE company_id = ?`[
-        (company_name, address, phone)
+      `UPDATE company SET comcompany_name = ? address = ?, phone = ?,brand_id=? WHERE company_id = ?`[
+        (company_name, address, phone, brand_id)
       ]
     );
 

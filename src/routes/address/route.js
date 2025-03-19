@@ -13,19 +13,34 @@ router.post("/", async (req, res) => {
     const fileContent = fs.readFileSync(filePath, "utf8");
     const addresses = JSON.parse(fileContent);
 
+    // Ensure that the necessary data is provided in the request body
+    const { address_name, user_id } = req.body;
+    if (!address_name || !user_id) {
+      return res
+        .status(400)
+        .json({ message: "Address name and user_id are required." });
+    }
+
     // Loop through each address and insert it into the database
     for (const address of addresses) {
       const { district, amphoe, province, zipcode } = address;
 
-      // Assuming `address_name` and `user_id` are provided in the request body or default values
-      const address_name = req.body.address_name || "Default Address Name";
-      const user_id = req.body.user_id || 1; // Example customer ID
-
-      // Insert the address data into the database
-      await db.query(
+      // Insert the address into the database
+      const result = await db.query(
         "INSERT INTO address (address_name, user_id, district, amphoe, province, zipcode) VALUES (?, ?, ?, ?, ?, ?)",
         [address_name, user_id, district, amphoe, province, zipcode]
       );
+
+      // Log the inserted data
+      console.log("Inserted address:", {
+        address_name,
+        user_id,
+        district,
+        amphoe,
+        province,
+        zipcode,
+        insertId: result.insertId, // Assuming `insertId` is returned by the query
+      });
     }
 
     res.status(201).json({ message: "Addresses added successfully." });
