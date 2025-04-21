@@ -6,7 +6,17 @@ const router = express.Router();
 // Fetch all order_details
 router.get("/", async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT * FROM order_details");
+    const { order_id } = req.query;
+
+    let query = "SELECT * FROM order_details";
+    const params = [];
+
+    if (order_id) {
+      query += " WHERE order_id = ?";
+      params.push(order_id);
+    }
+
+    const [rows] = await db.query(query, params);
     res.json(rows);
   } catch (error) {
     console.error("Error fetching order_details:", error);
@@ -23,6 +33,7 @@ router.post("/", async (req, res) => {
       order_id,
       pro_id,
       pro_detail_id,
+      item_id,
       quantity,
       selling_price,
       total_price,
@@ -31,14 +42,15 @@ router.post("/", async (req, res) => {
     } = data;
 
     const [result] = await db.query(
-      `INSERT INTO order_details (order_detail_id, order_id, pro_id, pro_detail_id, quantity, selling_price, total_price, total_quantity, transport_id) 
-       VALUES (?, ?, ?, ?,?, ?, ?, ?, ?)`,
+      `INSERT INTO order_details (order_detail_id, order_id, pro_id,item_id, pro_detail_id, quantity, selling_price, total_price, total_quantity, transport_id, ) 
+       VALUES (?, ?, ?, ?,?, ?, ?, ?, ?,? , ?)`,
 
       [
         order_detail_id,
         order_id,
         pro_id,
         pro_detail_id,
+        item_id,
         quantity,
         selling_price,
         total_price,
@@ -63,6 +75,7 @@ router.put("/", async (req, res) => {
       order_id,
       pro_id,
       pro_detail_id,
+      item_id,
       quantity,
       selling_price,
       total_price,
@@ -72,18 +85,20 @@ router.put("/", async (req, res) => {
 
     const [result] = await db.query(
       `UPDATE order_details 
-       SET order_detail_id = ?, order_id = ?, pro_id = ?,  pro_detail_id = ?, quantity = ?, selling_price = ?, total_price = ?, total_quantity = ?, transport_id = ? 
+       SET order_detail_id = ?, order_id = ?, pro_id = ?,  pro_detail_id = ?, item_id = ?, quantity = ?, selling_price = ?, total_price = ?, total_quantity = ?, transport_id = ? ,  = ? 
        WHERE order_detail_id = ?`,
 
       [
         order_id,
         pro_id,
         pro_detail_id,
+        item_id,
         quantity,
         selling_price,
         total_price,
         total_quantity,
         transport_id,
+        ,
         order_detail_id,
       ]
     );

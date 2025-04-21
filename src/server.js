@@ -20,6 +20,8 @@ import companyRouter from "./routes/company/route.js";
 import productDetailItemRouter from "./routes/product_detail_items/route.js";
 import statusOrdersRouter from "./routes/status_orders/route.js";
 import loginRouter from "./routes/login/route.js";
+import orderAdminRouter from "./routes/orderAdmin/route.js";
+import userAdminRouter from "./routes/userAdmin/route.js";
 
 // โหลดค่า .env
 dotenv.config();
@@ -56,6 +58,9 @@ app.use("/api/company", companyRouter);
 app.use("/api/product_detail_items", productDetailItemRouter);
 app.use("/api/status_orders", statusOrdersRouter);
 app.use("/api/login", loginRouter);
+app.use("/api/orderAdmin", orderAdminRouter);
+
+app.use("/api/userAdmin", userAdminRouter);
 
 // Start Server
 app.listen(PORT, "0.0.0.0", () => {

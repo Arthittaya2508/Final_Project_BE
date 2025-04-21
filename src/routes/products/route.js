@@ -20,13 +20,20 @@ router.post("/", async (req, res) => {
       req.body;
 
     // ตรวจสอบว่าทุกฟิลด์ที่ต้องการมีค่า
-    if (!sku || !pro_name || !pro_des || !category_id || !brand_id) {
+    if (
+      !sku ||
+      !pro_name ||
+      !pro_des ||
+      !category_id ||
+      !brand_id ||
+      !gender_id
+    ) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
     const [result] = await db.query(
       `INSERT INTO products (sku, pro_name, pro_des, category_id, brand_id,gender_id)
-      VALUES (?, ?, ?, ?, ?,?)`,
+      VALUES (?, ?, ?, ?, ?,? )`,
       [sku, pro_name, pro_des, category_id, brand_id, gender_id]
     );
 
