@@ -1,25 +1,34 @@
-import express from "express"; // ใช้ import แทน require
-import db from "../../lib/db.js"; // ใช้ import แทน require
+import express from "express";
+import db from "../../lib/db.js";
 
 const router = express.Router();
 
-// Fetch all orders
+// ✅ Fetch orders (all หรือ filter ตาม user_id)
 router.get("/", async (req, res) => {
   try {
-    const [rows] = await db.query(
-      "SELECT * FROM orders ORDER BY order_date DESC;"
-    );
-    res.json(rows);
+    const { user_id } = req.query;
+
+    let query = "SELECT * FROM orders";
+    const values = [];
+
+    if (user_id) {
+      query += " WHERE user_id = ?";
+      values.push(user_id);
+    }
+
+    query += " ORDER BY order_date DESC";
+
+    const [rows] = await db.query(query, values);
+    res.json({ orders: rows });
   } catch (error) {
     console.error("Error fetching orders:", error);
     res.status(500).json({ error: "Failed to fetch orders" });
   }
 });
 
-// Add a new order
+// ✅ Add a new order
 router.post("/", async (req, res) => {
   try {
-    const data = req.body;
     const {
       user_id,
       order_date,
@@ -27,10 +36,11 @@ router.post("/", async (req, res) => {
       shipping_date,
       status_id,
       transport_id,
-    } = data;
+    } = req.body;
 
     const [result] = await db.query(
-      `INSERT INTO orders (user_id, order_date, total_amount, shipping_date, status_id,transport_id) VALUES (?, ?,?, ?, ?, ?)`,
+      `INSERT INTO orders (user_id, order_date, total_amount, shipping_date, status_id, transport_id)
+       VALUES (?, ?, ?, ?, ?, ?)`,
       [
         user_id,
         order_date,
@@ -48,10 +58,9 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Update an existing order
+// ✅ Update an existing order
 router.put("/", async (req, res) => {
   try {
-    const data = req.body;
     const {
       order_id,
       user_id,
@@ -60,18 +69,20 @@ router.put("/", async (req, res) => {
       shipping_date,
       status_id,
       transport_id,
-    } = data;
+    } = req.body;
 
     const [result] = await db.query(
-      `UPDATE orders SET user_id = ?, order_date = ?, total_amount = ?, shipping_date = ?, status_id = ?,transport_id = ? WHERE order_id = ?`,
+      `UPDATE orders
+       SET user_id = ?, order_date = ?, total_amount = ?, shipping_date = ?, status_id = ?, transport_id = ?
+       WHERE order_id = ?`,
       [
         user_id,
         order_date,
         total_amount,
         shipping_date,
         status_id,
-        order_id,
         transport_id,
+        order_id,
       ]
     );
 
@@ -82,11 +93,10 @@ router.put("/", async (req, res) => {
   }
 });
 
-// Delete an existing order
+// ✅ Delete an order
 router.delete("/", async (req, res) => {
   try {
-    const data = req.body;
-    const { order_id } = data;
+    const { order_id } = req.body;
 
     const [result] = await db.query(`DELETE FROM orders WHERE order_id = ?`, [
       order_id,
@@ -99,5 +109,5 @@ router.delete("/", async (req, res) => {
   }
 });
 
-// เปลี่ยนจาก module.exports เป็น export default
+// ✅ Export route
 export default router;

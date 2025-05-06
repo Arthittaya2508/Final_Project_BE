@@ -1,13 +1,24 @@
 import express from "express";
-import db from "../../lib/db.js"; // เพิ่ม `.js` ที่ท้ายไฟล์
+import db from "../../lib/db.js";
 
 const router = express.Router();
 
-// Fetch all brands
+// Fetch all brands, or by company_id
 router.get("/", async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT * FROM brands");
-    res.json(rows);
+    const { company_id } = req.query;
+
+    let query = "SELECT * FROM brands";
+    let params = [];
+
+    // ตรวจสอบว่ามีการส่ง company_id มาหรือไม่
+    if (company_id) {
+      query += " WHERE company_id = ?";
+      params.push(company_id); // ใส่ company_id ลงใน parameters
+    }
+
+    const [rows] = await db.query(query, params);
+    res.json(rows); // ส่งข้อมูลแบรนด์ที่กรองแล้วกลับไป
   } catch (error) {
     console.error("Error fetching brands:", error);
     res.status(500).json({ error: "Failed to fetch brands" });
@@ -17,20 +28,20 @@ router.get("/", async (req, res) => {
 // Add a new brand
 router.post("/", async (req, res) => {
   try {
-    const { brand_name } = req.body; // รับข้อมูล brand_name จาก request body
+    const { brand_name, company_id } = req.body;
 
-    if (!brand_name) {
-      return res.status(400).json({ error: "Color name is required" });
+    if (!brand_name || !company_id) {
+      return res
+        .status(400)
+        .json({ error: "Brand name and company ID are required" });
     }
 
-    // Insert the new brand into the brands table
     const [result] = await db.query(
-      "INSERT INTO brands (brand_name) VALUES (?)",
-      [brand_name]
+      "INSERT INTO brands (brand_name, company_id) VALUES (?, ?)",
+      [brand_name, company_id]
     );
 
-    // Respond with the newly added brand's id and name
-    res.status(201).json({ brand_id: result.insertId, brand_name });
+    res.status(201).json({ brand_id: result.insertId, brand_name, company_id });
   } catch (error) {
     console.error("Error adding brand:", error);
     res.status(500).json({ error: "Failed to add brand" });
@@ -40,11 +51,17 @@ router.post("/", async (req, res) => {
 // Update an existing brand
 router.put("/", async (req, res) => {
   try {
-    const { brand_id, brand_name } = req.body;
+    const { brand_id, brand_name, company_id } = req.body;
+
+    if (!brand_id || !brand_name || !company_id) {
+      return res
+        .status(400)
+        .json({ error: "Brand ID, name, and company ID are required" });
+    }
 
     const [result] = await db.query(
-      `UPDATE brands SET brand_name = ? WHERE brand_id = ?`,
-      [brand_name, brand_id]
+      `UPDATE brands SET brand_name = ?, company_id = ? WHERE brand_id = ?`,
+      [brand_name, company_id, brand_id]
     );
 
     res.json({ success: true, result });
@@ -58,6 +75,10 @@ router.put("/", async (req, res) => {
 router.delete("/", async (req, res) => {
   try {
     const { brand_id } = req.body;
+
+    if (!brand_id) {
+      return res.status(400).json({ error: "Brand ID is required" });
+    }
 
     const [result] = await db.query(`DELETE FROM brands WHERE brand_id = ?`, [
       brand_id,

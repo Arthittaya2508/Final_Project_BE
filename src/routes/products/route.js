@@ -6,11 +6,22 @@ const router = express.Router();
 // Fetch all products
 router.get("/", async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT * FROM products");
-    res.json(rows);
+    const { brand_id } = req.query;
+
+    let query = "SELECT * FROM products";
+    let params = [];
+
+    // ตรวจสอบว่ามีการส่ง company_id มาหรือไม่
+    if (brand_id) {
+      query += " WHERE brand_id = ?";
+      params.push(brand_id); // ใส่ company_id ลงใน parameters
+    }
+
+    const [rows] = await db.query(query, params);
+    res.json(rows); // ส่งข้อมูลแบรนด์ที่กรองแล้วกลับไป
   } catch (error) {
-    console.error("Error fetching products:", error);
-    res.status(500).json({ error: "Failed to fetch products" });
+    console.error("Error fetching brands:", error);
+    res.status(500).json({ error: "Failed to fetch brands" });
   }
 });
 

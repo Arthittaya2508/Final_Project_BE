@@ -29,36 +29,40 @@ router.get("/", async (req, res) => {
 // Add a new product
 router.post("/", async (req, res) => {
   try {
-    console.log("📥 ข้อมูลที่ได้รับจาก Frontend:", req.body);
+    const items = req.body;
 
-    const {
-      pro_detail_id,
-      color_id,
-      size_id,
-      stock_quantity,
-      sale_price,
-      cost_price,
-    } = req.body;
-
-    if (
-      pro_detail_id === undefined ||
-      color_id === undefined ||
-      size_id === undefined ||
-      stock_quantity === undefined ||
-      sale_price === undefined ||
-      cost_price === undefined
-    ) {
-      return res.status(400).json({ error: "Missing required fields" });
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: "Invalid request data" });
     }
 
-    const [result] = await db.query(
-      `INSERT INTO product_detail_items (pro_detail_id, color_id, size_id, stock_quantity, sale_price, cost_price)
-      VALUES (?, ?, ?, ?, ?, ?)`,
+    const results = [];
 
-      [pro_detail_id, color_id, size_id, stock_quantity, sale_price, cost_price]
-    );
+    for (const item of items) {
+      const { pro_detail_id, size_id, stock_quantity, sale_price, cost_price } =
+        item;
 
-    res.json({ success: true, result });
+      if (
+        pro_detail_id === undefined ||
+        size_id === undefined ||
+        stock_quantity === undefined ||
+        sale_price === undefined ||
+        cost_price === undefined
+      ) {
+        return res
+          .status(400)
+          .json({ error: "Missing required fields in item" });
+      }
+
+      const [result] = await db.query(
+        `INSERT INTO product_detail_items (pro_detail_id, size_id, stock_quantity, sale_price, cost_price)
+        VALUES (?, ?, ?, ?, ?)`,
+        [pro_detail_id, size_id, stock_quantity, sale_price, cost_price]
+      );
+
+      results.push(result);
+    }
+
+    res.json({ success: true, results });
   } catch (error) {
     console.error("❌ Error inserting product:", error);
     res.status(500).json({ error: "Failed to add product" });
@@ -68,15 +72,8 @@ router.post("/", async (req, res) => {
 // Update an existing product using item_id
 router.put("/", async (req, res) => {
   try {
-    const {
-      item_id,
-      pro_detail_id,
-      color_id,
-      size_id,
-      stock_quantity,
-      sale_price,
-      cost_price,
-    } = req.body;
+    const { pro_detail_id, size_id, stock_quantity, sale_price, cost_price } =
+      req.body;
 
     if (!item_id) {
       return res.status(400).json({ error: "item_id is required" });
@@ -84,17 +81,9 @@ router.put("/", async (req, res) => {
 
     const [result] = await db.query(
       `UPDATE product_detail_items
-      SET pro_detail_id = ?, color_id = ?, size_id = ?, stock_quantity = ?, sale_price = ?, cost_price = ?
+      SET pro_detail_id = ?, size_id = ?, stock_quantity = ?, sale_price = ?, cost_price = ?
       WHERE pro_detail_id = ?`,
-      [
-        pro_detail_id,
-        color_id,
-        size_id,
-        stock_quantity,
-        sale_price,
-        cost_price,
-        item_id,
-      ]
+      [pro_detail_id, size_id, stock_quantity, sale_price, cost_price, item_id]
     );
 
     res.json({ success: true, result });
