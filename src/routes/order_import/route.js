@@ -7,10 +7,27 @@ console.log("✅ order_import route loaded");
 
 // GET: ดึงข้อมูลคำสั่งซื้อทั้งหมด
 router.get("/", async (req, res) => {
-  console.log("📥 GET /api/order_import");
+  const { order_import_id } = req.query; // ดึงค่า query string ที่ส่งมาจาก URL
+
+  console.log(`📥 GET /api/order_import?order_import_id=${order_import_id}`);
+
   try {
-    const [rows] = await db.query("SELECT * FROM order_import");
-    res.json(rows);
+    let query = "SELECT * FROM order_import"; // กำหนด query เบื้องต้น
+    let params = [];
+
+    // ถ้ามีการระบุ order_import_id
+    if (order_import_id) {
+      query += " WHERE order_import_id = ?";
+      params.push(order_import_id); // เพิ่ม order_import_id ไปใน params
+    }
+
+    const [rows] = await db.query(query, params); // ใช้ query ที่ปรับแล้ว
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "ไม่พบข้อมูลคำสั่งซื้อ" });
+    }
+
+    res.json(rows); // ส่งข้อมูลทั้งหมด (หรือแค่รายการที่ตรงกับ order_import_id)
   } catch (err) {
     console.error("❌ ดึงข้อมูล order_import ไม่สำเร็จ:", err);
     res.status(500).json({ message: "ไม่สามารถดึงข้อมูลได้" });
@@ -19,12 +36,13 @@ router.get("/", async (req, res) => {
 
 // POST: เพิ่มคำสั่งซื้อใหม่ พร้อมรายละเอียด
 router.post("/", async (req, res) => {
-  const { company_id, quantity, total_price, details } = req.body;
+  const { company_id, quantity, total_price, created_at, details } = req.body;
 
   console.log("📤 POST /api/order_import เรียกใช้งานด้วยข้อมูล:", {
     company_id,
     quantity,
     total_price,
+    created_at,
     details,
   });
 
@@ -34,9 +52,9 @@ router.post("/", async (req, res) => {
   try {
     // 1. Insert into order_import
     const [importResult] = await connection.query(
-      `INSERT INTO order_import (company_id, quantity, total_price)
-       VALUES (?, ?, ?)`,
-      [company_id, quantity, total_price]
+      `INSERT INTO order_import (company_id, quantity, total_price, created_at)
+       VALUES (?, ?, ? , ?)`,
+      [company_id, quantity, total_price, created_at]
     );
 
     const order_import_id = importResult.insertId;
