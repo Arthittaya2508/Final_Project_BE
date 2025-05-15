@@ -23,7 +23,7 @@ import loginRouter from "./routes/login/route.js";
 import orderAdminRouter from "./routes/orderAdmin/route.js";
 import userAdminRouter from "./routes/userAdmin/route.js";
 import orderImportRouter from "./routes/order_import/route.js";
-import productImportRouter from "./routes/product_import/route.js";
+import productReceiveRouter from "./routes/product_receive/route.js";
 import orderUserRouter from "./routes/orderUser/route.js";
 import orderImportDetailRouter from "./routes/order_import_detail/route.js";
 
@@ -65,7 +65,7 @@ app.use("/api/login", loginRouter);
 app.use("/api/orderAdmin", orderAdminRouter);
 app.use("/api/userAdmin", userAdminRouter);
 app.use("/api/order_import", orderImportRouter);
-app.use("/api/product_import", productImportRouter);
+app.use("/api/product_receive", productReceiveRouter);
 app.use("/api/orderUser", orderUserRouter);
 app.use("/api/order_import_detail", orderImportDetailRouter);
 

@@ -95,16 +95,28 @@ router.put("/", async (req, res) => {
   const order_import_id = req.query.order_import_id;
   const items = req.body.items;
 
-  if (!order_import_id || !Array.isArray(items)) {
-    return res.status(400).json({ message: "ข้อมูลไม่ครบถ้วน" });
+  if (!order_import_id || !Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ message: "ข้อมูลไม่ครบถ้วนหรือไม่มีข้อมูล" });
   }
 
   const connection = await db.getConnection();
   await connection.beginTransaction();
 
   try {
+    // ทำการอัปเดตข้อมูลทั้งหมดที่ส่งมาใน items
     for (const item of items) {
       const { pro_id, color_id, size_id, quantity, cost_price } = item;
+
+      // ตรวจสอบข้อมูลก่อนทำการอัปเดต
+      if (
+        !pro_id ||
+        !color_id ||
+        !size_id ||
+        quantity === undefined ||
+        cost_price === undefined
+      ) {
+        continue; // ข้ามถ้าข้อมูลไม่ครบถ้วน
+      }
 
       await connection.query(
         `UPDATE order_import_detail
